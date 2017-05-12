@@ -14,38 +14,49 @@ public class TimeServer {
                 DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                 DatagramSocket socket = new DatagramSocket(9876);
                 InetAddress IPAddress = InetAddress.getByName("localhost");
-                socket.setSoTimeout(100000);
+                socket.setSoTimeout(10000);
                 String formato = "SSS";
                 String formatoFull = "HH:mm:ss:SS";
                 // recebe pacote 
-		socket.receive(receivePacket);
-                // i0
-                Date antes = new java.util.Date();
-                SimpleDateFormat formata = new SimpleDateFormat(formato);
-                String i0 = formata.format(antes);
-                long i0ms = antes.getTime();
-                
-                // data agora
-		Date agora = new java.util.Date();
-                SimpleDateFormat formataFull = new SimpleDateFormat(formatoFull);
-                String hora = formataFull.format(agora);
-                long datams = agora.getTime();
-                
-                //i1
-                Date depois = new java.util.Date();
-                formata = new SimpleDateFormat(formato);
-                String i1 = formata.format(depois);
-                long i1ms = depois.getTime();
-                
-                long i = i1ms - i0ms;
-                String mensagem = datams +"-"+ i;
-                System.out.println(mensagem);
-                byte[] sendData = new byte[1024];
+                while(true){
+                    try{
+                        // i0
+                        Date antes = new java.util.Date();
+                        SimpleDateFormat formata = new SimpleDateFormat(formato);
+                        String i0 = formata.format(antes);
+                        long i0ms = antes.getTime();
+                        
+                        Thread.sleep(5000);
+                        socket.receive(receivePacket);
+                        
+                        // data agora
+                        Date agora = new java.util.Date();
+                        SimpleDateFormat formataFull = new SimpleDateFormat(formatoFull);
+                        String hora = formataFull.format(agora);
+                        long datams = agora.getTime();
 
-                sendData = mensagem.getBytes();
-                System.out.println(sendData);
-                DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,receivePacket.getPort());
-                socket.send(sendPacket);
+                        //i1
+                        Date depois = new java.util.Date();
+                        formata = new SimpleDateFormat(formato);
+                        String i1 = formata.format(depois);
+                        long i1ms = depois.getTime();
+
+                        long i = i1ms - i0ms;
+                        String mensagem = datams +"-"+ i;
+                        System.out.println(mensagem);
+                        byte[] sendData = new byte[1024];
+
+                        sendData = mensagem.getBytes();
+                        System.out.println(sendData);
+                        DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,receivePacket.getPort());
+                        socket.send(sendPacket);
+                    }catch(Exception ex){
+                        System.out.println("Socket nao recebeu mais mensagens");
+                        break;
+                    }
+                    
+                }
+		
 	}
 	
 	

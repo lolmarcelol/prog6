@@ -27,7 +27,7 @@ public class Cliente {
                 String T0 = formata.format(antes);
                 int T0int = Integer.parseInt(T0);
                 long t0ms = antes.getTime();
-                System.out.println(T0int);
+                System.out.println("T0:"+T0int);
 
                 // ----
 		mSocket.send(sendPacket);
@@ -37,7 +37,7 @@ public class Cliente {
                 formata = new SimpleDateFormat(formato);
                 String T1 = formata.format(depois);
                 int T1int = Integer.parseInt(T1);
-                System.out.println(T1int);
+                System.out.println("T1: "+T1int);
                 long t1ms = depois.getTime();
                 // ----
                 
@@ -50,11 +50,12 @@ public class Cliente {
                 String i = horaPorta[1];
                 long ilong = Long.parseLong(i);
                 System.out.println("Hora: "+hora);
-                System.out.println("iInt: "+ilong);
+                System.out.println("iLon: "+ilong);
                 long d = (t1ms-t0ms -ilong)/2;
                 System.out.println("D; "+d);
                 long horafinal = hora - d;
-                Date datefinal=new Date(horafinal);       
+                Date datefinal=new Date(horafinal);
+                System.out.println("Data antiga: "+horaparam);
                 System.out.println("A hora atualizada é: "+datefinal);
 	}	
 	
