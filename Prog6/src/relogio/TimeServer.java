@@ -16,26 +16,29 @@ public class TimeServer {
                 InetAddress IPAddress = InetAddress.getByName("localhost");
                 socket.setSoTimeout(100000);
                 String formato = "SSS";
-                String formatoFull = "HH:mm:ss";
+                String formatoFull = "HH:mm:ss:SS";
                 // recebe pacote 
 		socket.receive(receivePacket);
                 // i0
                 Date antes = new java.util.Date();
                 SimpleDateFormat formata = new SimpleDateFormat(formato);
                 String i0 = formata.format(antes);
+                long i0ms = antes.getTime();
                 
                 // data agora
 		Date agora = new java.util.Date();
                 SimpleDateFormat formataFull = new SimpleDateFormat(formatoFull);
                 String hora = formataFull.format(agora);
+                long datams = agora.getTime();
                 
                 //i1
                 Date depois = new java.util.Date();
                 formata = new SimpleDateFormat(formato);
                 String i1 = formata.format(depois);
+                long i1ms = depois.getTime();
                 
-                int i = Integer.parseInt(i1) - Integer.parseInt(i0);
-                String mensagem = hora +"-"+ i1;
+                long i = i1ms - i0ms;
+                String mensagem = datams +"-"+ i;
                 System.out.println(mensagem);
                 byte[] sendData = new byte[1024];
 

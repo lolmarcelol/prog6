@@ -26,17 +26,19 @@ public class Cliente {
                 SimpleDateFormat formata = new SimpleDateFormat(formato);
                 String T0 = formata.format(antes);
                 int T0int = Integer.parseInt(T0);
+                long t0ms = antes.getTime();
+                System.out.println(T0int);
 
                 // ----
 		mSocket.send(sendPacket);
-                System.out.println("enviou");
                 mSocket.receive(receivePacket);
-                System.out.println("recebeu");
                 // hora de recebimento T1
                 Date depois = new java.util.Date();
                 formata = new SimpleDateFormat(formato);
                 String T1 = formata.format(depois);
                 int T1int = Integer.parseInt(T1);
+                System.out.println(T1int);
+                long t1ms = depois.getTime();
                 // ----
                 
                 String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),
@@ -44,16 +46,16 @@ public class Cliente {
                 System.out.println("Recebido do server: "+resposta);
 
                 String[] horaPorta = resposta.split("-");
-                String hora = horaPorta[0]; // usuario
+                Long hora = Long.parseLong(horaPorta[0]); // usuario
                 String i = horaPorta[1];
-                int iint = Integer.parseInt(i);
-                System.out.println("I: "+i);
+                long ilong = Long.parseLong(i);
                 System.out.println("Hora: "+hora);
-                System.out.println(T0int);
-                System.out.println(T1int);
-                System.out.println("iInt: "+iint);
-                int d = (T1int-T0int -iint)/2;
+                System.out.println("iInt: "+ilong);
+                long d = (t1ms-t0ms -ilong)/2;
                 System.out.println("D; "+d);
+                long horafinal = hora - d;
+                Date datefinal=new Date(horafinal);       
+                System.out.println("A hora atualizada é: "+datefinal);
 	}	
 	
 }
