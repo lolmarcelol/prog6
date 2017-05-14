@@ -47,7 +47,6 @@ public class TimeServer {
                         byte[] sendData = new byte[1024];
 
                         sendData = mensagem.getBytes();
-                        System.out.println(sendData);
                         DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,receivePacket.getPort());
                         socket.send(sendPacket);
                     }catch(Exception ex){

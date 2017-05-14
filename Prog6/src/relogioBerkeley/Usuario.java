@@ -2,11 +2,10 @@ package relogioBerkeley;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.management.ManagementFactory;
 import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -16,13 +15,11 @@ public class Usuario {
                 InetAddress ip;
 		byte[] sendData = new byte[1024];
 		byte[] receiveData = new byte[1024];
-		BufferedReader buffer = new BufferedReader(new InputStreamReader(System.in));
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                DatagramPacket sendPacket; new DatagramPacket(sendData,sendData.length);
 		MulticastSocket mSocket = new MulticastSocket(3333);
-		String group = "224.0.0.1";		
+		String group = "224.0.0.2";		
 		mSocket.joinGroup(InetAddress.getByName(group));
-                
+                DatagramSocket socket = new DatagramSocket();
                 Scanner sc = new Scanner(System.in);
                 System.out.println("Digite a hora, formato hh");
                 int hour = sc.nextInt();
@@ -37,19 +34,23 @@ public class Usuario {
 
                 String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),
 				receivePacket.getLength());
-                System.out.println(resposta);
-                // aqui muda
                 String[] horaPorta = resposta.split("-");
                 Date serverDate = new Date(Long.parseLong(horaPorta[0]));
                 long serverLong = Long.parseLong(horaPorta[0]);
                 port = Integer.parseInt(horaPorta[1]);
-                System.out.println(port);               
                 long diferenca =horaparam.getTime() - serverLong;
                 String mensagem = Long.toString(diferenca);
                 sendData = mensagem.getBytes();
 		DatagramPacket pacote = new DatagramPacket(sendData, sendData.length,receivePacket.getAddress() , port);
-                mSocket.send(pacote);
-                mSocket.receive(pacote);
+                socket.send(pacote);
+                socket.receive(receivePacket);
+                resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
+                
+                long acertar = Long.parseLong(resposta);
+                long horaFinal = horaparam.getTime() + acertar;
+                Date horaFinalData = new Date(horaFinal);
+                System.out.println("Hora do cliente antes de atualizar: "+horaparam);
+                System.out.println("Hora atualizada do cliente"+horaFinalData);
                 
 	}	
 	
