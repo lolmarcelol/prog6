@@ -42,24 +42,13 @@ public class Eleicao {
         }catch(Exception ex){
             System.out.println("virei cordenador");
             cordenador = true;
-            socket.send(pacote);
-            portaCordenador = socket.getPort();
+            portaCordenador = socket.getLocalPort();
         }
         // incial pronto,falta logica depois de entrar
         multiSocket.setSoTimeout(0);
-        while(cordenador){
-            System.out.println("entrei no loop cordenador");
-            multiSocket.receive(receivePacket);
-            resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
-            System.out.println("resposta cordenador: "+resposta);
-            if(resposta.equals("cordenador") || resposta.equals("aya")){
-                mensagem = Integer.toString(socket.getPort());
-                System.out.println("porta do coordenador"+mensagem);
-                send = mensagem.getBytes();
-                pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , receivePacket.getPort());
-                socket.send(pacote);
-            }
-        }
+        
+
+        
         while(!cordenador){
             try{
                 System.out.println("entrei no loop nao cordenador");
@@ -76,12 +65,7 @@ public class Eleicao {
                 socket.receive(pacote);
                 resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
                 System.out.println(resposta);
-
-//                multiSocket.receive(pacote);
-//                resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
-//                if(resposta.equals("eleicao")){
-//                    
-//                }
+                
             }catch(Exception ex){
                 System.out.println(ex);
                 System.out.println("cornador morreu, começar eleicao");
