@@ -22,17 +22,17 @@ public class CordenadorRunnable implements Runnable {
     public void run() {
         while(true){
             try{
-                receivePacket = null;
-                System.out.println("Minha porta é getPort: "+socket.getPort()+" LocalPort: "+socket.getLocalPort());
-                System.out.println("entrei no loop cordenador");
-                multiSocket.receive(receivePacket);
+                
+                new Thread(new OuvirNoobs(multiSocket,socket.getLocalPort())).start();
+                System.out.println("Eu cordenadorAya atendo"+socket.getLocalPort());
+                socket.receive(receivePacket);
                 String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
-                System.out.println("Eu cordenador recebi: "+resposta);
+                System.out.println("Eu cordenadorAya recebi: "+resposta);
                 String mensagem = Integer.toString(socket.getLocalPort());
                 send = mensagem.getBytes();
                 DatagramPacket pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , receivePacket.getPort());
                 socket.send(pacote);
-                System.out.println(" E enviei minha porta : "+mensagem+"/n/n");
+                System.out.println(" E enviei minha porta : "+mensagem+"para: "+receivePacket.getPort());
 
             }catch(Exception ex){
                 System.out.println(ex);

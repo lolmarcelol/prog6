@@ -56,7 +56,7 @@ public class TimeServer {
                         socket.send(pacote);
                     }
                 long agoraLong = agora.getTime();
-                long horasLong = agoraLong + aux;
+                long horasLong = agoraLong - aux;
                 horasServer = new Date(horasLong);
                 break;
                 }

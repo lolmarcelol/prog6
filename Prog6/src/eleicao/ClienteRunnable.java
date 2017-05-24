@@ -40,7 +40,8 @@ public class ClienteRunnable implements Runnable {
                  System.out.println(portaCordenador);
                 pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , portaCordenador);
                 socket.send(pacote);
-                System.out.println("enviei:"+mensagem);
+                System.out.println("enviei:"+mensagem+"para: "+portaCordenador);
+                System.out.println("Minha porta eh: "+socket.getLocalPort());
                 socket.receive(receivePacket);
                 String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
                 System.out.println(resposta);
