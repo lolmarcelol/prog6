@@ -37,10 +37,11 @@ public class ClienteRunnable implements Runnable {
                 Thread.sleep(randomNumber);
                 mensagem = "aya";
                 send = mensagem.getBytes();
+                 System.out.println(portaCordenador);
                 pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , portaCordenador);
                 socket.send(pacote);
                 System.out.println("enviei:"+mensagem);
-                socket.receive(pacote);
+                socket.receive(receivePacket);
                 String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
                 System.out.println(resposta);
                 

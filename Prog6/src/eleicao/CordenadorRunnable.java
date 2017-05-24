@@ -22,6 +22,8 @@ public class CordenadorRunnable implements Runnable {
     public void run() {
         while(true){
             try{
+                receivePacket = null;
+                System.out.println("Minha porta é getPort: "+socket.getPort()+" LocalPort: "+socket.getLocalPort());
                 System.out.println("entrei no loop cordenador");
                 multiSocket.receive(receivePacket);
                 String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
