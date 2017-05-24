@@ -35,7 +35,7 @@ public class Main {
             multiSocket.receive(receivePacket);
             multiSocket.receive(receivePacket);
             resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
-            System.out.println("recebeu a porta do cordenador:"+resposta);
+            System.out.println("recebeu a porta do cordenador:"+receivePacket.getPort());
             portaCordenador = Integer.parseInt(resposta);
         }catch(Exception ex){
             System.out.println("virei cordenador");
@@ -44,6 +44,15 @@ public class Main {
         }
         // come~co do multiThread vamo ae
         multiSocket.setSoTimeout(0);
+        if(cordenador){
+            // inicia cordenador
+            new Thread(new CordenadorRunnable(multiSocket,socket)).start();
+        }else{
+            //inicia o outro
+            new Thread(new ClienteRunnable(multiSocket,socket,portaCordenador,idaux[0])).start();
+
+        }
+        
         
     }
 }
