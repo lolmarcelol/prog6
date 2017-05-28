@@ -1,7 +1,6 @@
 package eleicao;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -31,11 +30,7 @@ public class ClienteRunnable implements Runnable {
     public void run() {
         try{
         socket.setSoTimeout(5000);
-        String aux = ManagementFactory.getRuntimeMXBean().getName();
-        String[] idaux = aux.split("@");
-        int id = Integer.parseInt(idaux[0]);
-        while(true){
-            
+           while(true){
                System.out.println("entrei no loop nao cordenador");
                Random random = new Random();
                int randomNumber = random.nextInt(10)+5;
@@ -54,20 +49,10 @@ public class ClienteRunnable implements Runnable {
                System.out.println(resposta);
            }
        }catch(Exception ex){
-            System.out.println(ex);
-            System.out.println("cornador morreu, começar eleicao");
-            // fazer logica de eleicao aqui
-            mensagem = "eleicao";
-            send = mensagem.getBytes();
-            System.out.println(portaCordenador);
-            try{
-                pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , portaCordenador);
-                socket.send(pacote);
-            }catch(IOException io){
-            }
-            
+           System.out.println(ex);
+           System.out.println("cornador morreu, começar eleicao");
+           
        }
     }
        
 }
-   

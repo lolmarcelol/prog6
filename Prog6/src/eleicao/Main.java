@@ -43,8 +43,8 @@ public class Main {
             portaCordenador = socket.getLocalPort();
         }
         socket.setSoTimeout(0);
+        // come~co do multiThread vamo ae
         multiSocket.setSoTimeout(0);
-        //
         if(cordenador){
             // inicia cordenador
             new Thread(new CordenadorRunnable(multiSocket,socket)).start();
@@ -52,10 +52,7 @@ public class Main {
             //inicia o cliente
             new Thread(new ClienteRunnable(multiSocket,socket,portaCordenador,idaux[0],receivePacket)).start();
         }
-        while(true){
-            multiSocket.receive(receivePacket);
-            
-        }
+        
         
     }
 }
