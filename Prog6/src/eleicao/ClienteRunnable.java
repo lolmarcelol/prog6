@@ -5,7 +5,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ClienteRunnable implements Runnable {
     MulticastSocket multiSocket;
@@ -28,31 +31,60 @@ public class ClienteRunnable implements Runnable {
     
     @Override
     public void run() {
-        try{
-        socket.setSoTimeout(5000);
-           while(true){
-               System.out.println("entrei no loop nao cordenador");
-               Random random = new Random();
-               int randomNumber = random.nextInt(10)+5;
-               randomNumber = randomNumber*1000;
-               System.out.println("ñ cord dormi");
-               Thread.sleep(randomNumber);
-               mensagem = "aya";
-               send = mensagem.getBytes();
-               System.out.println(portaCordenador);
-               pacote = new DatagramPacket(send, send.length,receivePacket.getAddress() , portaCordenador);
-               socket.send(pacote);
-               System.out.println("enviei:"+mensagem+"para: "+portaCordenador);
-               System.out.println("Minha porta eh: "+socket.getLocalPort());
-               socket.receive(receivePacket);
-               String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
-               System.out.println(resposta);
+        while(true){
+            try{
+            socket.setSoTimeout(5000);
+               while(true){
+                    System.out.println("entrei no loop nao cordenador");
+                    Random random = new Random();
+                    int randomNumber = random.nextInt(10)+5;
+                    randomNumber = randomNumber*1000;
+                    System.out.println("ñ cord dormi");
+                    Thread.sleep(randomNumber);
+                    mensagem = "aya";
+                    send = mensagem.getBytes();
+                    System.out.println(portaCordenador);
+                    System.out.println("enviando:"+mensagem+"para: "+portaCordenador);
+                    pacote = new DatagramPacket(send, send.length,receivePacket.getAddress() , 63387);
+                    socket.send(pacote);
+                    System.out.println("enviei:"+mensagem+"para: "+portaCordenador);
+                    System.out.println("Minha porta eh: "+socket.getLocalPort());
+                    socket.receive(receivePacket);
+                    String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
+                    System.out.println(resposta);
+               }
+           }catch(Exception ex){
+                System.out.println(ex);
+                System.out.println("cornador morreu, começar eleicao");
+                mensagem = id;
+                send = mensagem.getBytes();
+                try {
+                    pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
+                    socket.send(pacote);
+                    socket.receive(receivePacket); // receber ok
+                    socket.setSoTimeout(0);
+                    multiSocket.receive(receivePacket); // espera para receber a nova porta de cordenador
+                    String port = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
+                    this.portaCordenador = Integer.parseInt(port);
+                    
+                } catch (IOException ex1) {
+                    System.out.println("sou cordenador");
+                    //virar cordenador
+                    mensagem = Integer.toString(socket.getLocalPort());
+                    send = mensagem.getBytes();
+                    try {
+                        pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
+                        socket.send(pacote);
+
+                    } catch (Exception ex2) {
+                        System.out.println("ex2: "+ex2);
+                    }
+                    new Thread(new CordenadorRunnable(multiSocket,socket)).start();
+                }
+
            }
-       }catch(Exception ex){
-           System.out.println(ex);
-           System.out.println("cornador morreu, começar eleicao");
-           
-       }
+
+        }
     }
        
 }

@@ -7,10 +7,12 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+
 public class Main {
+    //public static int portaCordenador;
     public static void main(String[] args) throws IOException  {
-        boolean cordenador = false;
         int portaCordenador;
+        boolean cordenador = false;
         InetAddress ip;
         String resposta;
         byte[] send = new byte[1024];
@@ -43,14 +45,50 @@ public class Main {
             portaCordenador = socket.getLocalPort();
         }
         socket.setSoTimeout(0);
-        // come~co do multiThread vamo ae
         multiSocket.setSoTimeout(0);
         if(cordenador){
-            // inicia cordenador
             new Thread(new CordenadorRunnable(multiSocket,socket)).start();
         }else{
             //inicia o cliente
             new Thread(new ClienteRunnable(multiSocket,socket,portaCordenador,idaux[0],receivePacket)).start();
+            while(true){
+                multiSocket.receive(receivePacket);
+                resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
+                if(!resposta.equals("cordenador")){
+                    System.out.println("CORDENADOR MORREU OMG !!");
+                    int idOutro = Integer.parseInt(resposta);
+                    if(id > idOutro){
+                        mensagem = "ok";
+                        send = mensagem.getBytes();
+                        pacote = new DatagramPacket(send, send.length,receivePacket.getAddress() , receivePacket.getPort());
+                        socket.send(pacote);
+                        // iniciar eleicao
+                        mensagem = Integer.toString(id);
+                        send = mensagem.getBytes();
+                        try {
+                            pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
+                            socket.send(pacote);
+                            socket.receive(receivePacket); // receber ok
+                            socket.setSoTimeout(0);
+                            multiSocket.receive(receivePacket); // espera para receber a nova porta de cordenador
+                            String port = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
+                            portaCordenador = Integer.parseInt(port);
+
+                        } catch (IOException ex1) {
+                            System.out.println("sou cordenador");
+                            //virar cordenador
+                            mensagem = Integer.toString(socket.getLocalPort());
+                            send = mensagem.getBytes();
+                            pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
+                            socket.send(pacote);
+                            new Thread(new CordenadorRunnable(multiSocket,socket)).start();
+                        }
+                    } 
+                }else{
+                    System.out.println("NOP");
+                }
+                
+            }
         }
         
         
