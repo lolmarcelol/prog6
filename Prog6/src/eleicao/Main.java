@@ -32,15 +32,15 @@ public class Main {
         send = mensagem.getBytes();
         DatagramPacket pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
         socket.send(pacote);
-        System.out.println("enviou cordenador");
+        System.out.println("Main: enviou cordenador");
         try{
             socket.receive(receivePacket);
             //multiSocket.receive(receivePacket);
             resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
-            System.out.println("recebeu a porta do cordenador:"+resposta);
+            System.out.println("Main: recebeu a porta do cordenador:"+resposta);
             portaCordenador = Integer.parseInt(resposta);
         }catch(Exception ex){
-            System.out.println("virei cordenador");
+            System.out.println("Main: virei cordenador");
             cordenador = true;
             portaCordenador = socket.getLocalPort();
         }
@@ -51,41 +51,62 @@ public class Main {
         }else{
             //inicia o cliente
             new Thread(new ClienteRunnable(multiSocket,socket,portaCordenador,idaux[0],receivePacket)).start();
+            System.out.println("Main: sai da morte");
             while(true){
-                multiSocket.receive(receivePacket);
-                resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
+                DatagramPacket receiveMultiPacket = new DatagramPacket(receiveData, receiveData.length);
+                multiSocket.receive(receiveMultiPacket);
+                resposta = new String(receiveMultiPacket.getData(), receiveMultiPacket.getOffset(),receiveMultiPacket.getLength());
                 if(!resposta.equals("cordenador")){
-                    System.out.println("CORDENADOR MORREU OMG !!");
+                    System.out.println("Main: CORDENADOR MORREU OMG !!");
                     int idOutro = Integer.parseInt(resposta);
                     if(id > idOutro){
+                        System.out.println("Main: vou enviar ok pro maluco");
                         mensagem = "ok";
                         send = mensagem.getBytes();
-                        pacote = new DatagramPacket(send, send.length,receivePacket.getAddress() , receivePacket.getPort());
+                        pacote = new DatagramPacket(send, send.length,receiveMultiPacket.getAddress() , receiveMultiPacket.getPort());
                         socket.send(pacote);
+                        System.out.println("Main: Enviei okay");
                         // iniciar eleicao
                         mensagem = Integer.toString(id);
                         send = mensagem.getBytes();
+                        System.out.println("Main: Vou iniciar uma eleicao");
                         try {
                             pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
                             socket.send(pacote);
-                            socket.receive(receivePacket); // receber ok
+                            System.out.println("Main: Enviei mensagem pro grupo");
+                            socket.setSoTimeout(5000);
+                            socket.receive(receiveMultiPacket); // receber ok
+                            System.out.println("Main: Recebi um okay, vou esperar para receber uma porta nova");
                             socket.setSoTimeout(0);
-                            multiSocket.receive(receivePacket); // espera para receber a nova porta de cordenador
-                            String port = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
+                            multiSocket.receive(receiveMultiPacket); // espera para receber a nova porta de cordenador
+                            System.out.println("Main: Recebi a porta nova");
+                            String port = new String(receiveMultiPacket.getData(), receiveMultiPacket.getOffset(),receiveMultiPacket.getLength());
                             portaCordenador = Integer.parseInt(port);
 
                         } catch (IOException ex1) {
-                            System.out.println("sou cordenador");
+                            System.out.println("Main: sou cordenador");
                             //virar cordenador
                             mensagem = Integer.toString(socket.getLocalPort());
                             send = mensagem.getBytes();
                             pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
                             socket.send(pacote);
+                            socket.setSoTimeout(0);
+                            multiSocket.setSoTimeout(0);
                             new Thread(new CordenadorRunnable(multiSocket,socket)).start();
                         }
+                    }else if(id == idOutro){
+                        System.out.println("Main: sou cordenador");
+                        //virar cordenador
+                        mensagem = Integer.toString(socket.getLocalPort());
+                        send = mensagem.getBytes();
+                        pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
+                        socket.send(pacote);
+                        socket.setSoTimeout(0);
+                        multiSocket.setSoTimeout(0);
+                        new Thread(new CordenadorRunnable(multiSocket,socket)).start();
                     } 
                 }else{
-                    System.out.println("NOP");
+                    System.out.println("Main: nao é eleicao");
                 }
                 
             }

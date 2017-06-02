@@ -35,27 +35,27 @@ public class ClienteRunnable implements Runnable {
             try{
             socket.setSoTimeout(5000);
                while(true){
-                    System.out.println("entrei no loop nao cordenador");
+                    System.out.println("CRUN: entrei no loop nao cordenador");
                     Random random = new Random();
                     int randomNumber = random.nextInt(10)+5;
                     randomNumber = randomNumber*1000;
-                    System.out.println("ñ cord dormi");
+                    System.out.println("CRUN: ñ cord dormi");
                     Thread.sleep(randomNumber);
                     mensagem = "aya";
                     send = mensagem.getBytes();
                     System.out.println(portaCordenador);
-                    System.out.println("enviando:"+mensagem+"para: "+portaCordenador);
-                    pacote = new DatagramPacket(send, send.length,receivePacket.getAddress() , 63387);
+                    System.out.println("CRUN: enviando:"+mensagem+"para: "+portaCordenador);
+                    pacote = new DatagramPacket(send, send.length,receivePacket.getAddress() , portaCordenador);
                     socket.send(pacote);
-                    System.out.println("enviei:"+mensagem+"para: "+portaCordenador);
-                    System.out.println("Minha porta eh: "+socket.getLocalPort());
+                    System.out.println("CRUN: enviei:"+mensagem+"para: "+portaCordenador);
+                    System.out.println("CRUN: Minha porta eh: "+socket.getLocalPort());
                     socket.receive(receivePacket);
                     String resposta = new String(receivePacket.getData(), receivePacket.getOffset(),receivePacket.getLength());
                     System.out.println(resposta);
                }
            }catch(Exception ex){
                 System.out.println(ex);
-                System.out.println("cornador morreu, começar eleicao");
+                System.out.println("CRUN: cornador morreu, começar eleicao");
                 mensagem = id;
                 send = mensagem.getBytes();
                 try {
@@ -68,23 +68,14 @@ public class ClienteRunnable implements Runnable {
                     this.portaCordenador = Integer.parseInt(port);
                     
                 } catch (IOException ex1) {
-                    System.out.println("sou cordenador");
-                    //virar cordenador
-                    mensagem = Integer.toString(socket.getLocalPort());
-                    send = mensagem.getBytes();
-                    try {
-                        pacote = new DatagramPacket(send, send.length,InetAddress.getByName(group) , 3333);
-                        socket.send(pacote);
-
-                    } catch (Exception ex2) {
-                        System.out.println("ex2: "+ex2);
-                    }
-                    new Thread(new CordenadorRunnable(multiSocket,socket)).start();
+                    System.out.println("CRUN: virei cordenador pela thread, dei break");
+                    break;
                 }
 
            }
 
         }
+        System.out.println("Terminei minha execução de clienteRunnable");
     }
        
 }
